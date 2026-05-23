@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>賛美グループアプリ 設定ガイド</title>
+<style>
+body{font-family:'Hiragino Sans','Noto Sans JP',sans-serif;max-width:680px;margin:0 auto;padding:24px 20px 60px;background:#f8f5f0;color:#2d2520;line-height:1.7}
+h1{font-size:22px;color:#3a2e22;border-bottom:3px solid #8b7355;padding-bottom:10px;margin-bottom:6px}
+.subtitle{font-size:13px;color:#8b7355;margin-bottom:32px}
+h2{font-size:17px;color:#fff;background:linear-gradient(135deg,#6b5a3e,#8b7355);padding:10px 16px;border-radius:10px;margin:32px 0 16px}
+h3{font-size:14px;color:#6b5a3e;margin:20px 0 8px;border-left:3px solid #8b7355;padding-left:10px}
+.step{background:#fff;border-radius:14px;padding:18px 20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.step-num{display:inline-block;background:#8b7355;color:#fff;border-radius:50%;width:26px;height:26px;text-align:center;line-height:26px;font-size:13px;font-weight:700;margin-right:8px;flex-shrink:0}
+.step-title{font-weight:700;font-size:15px;color:#3a2e22;display:flex;align-items:center;margin-bottom:10px}
+.step-body{font-size:13px;color:#4a3f32;padding-left:34px}
+.step-body li{margin-bottom:6px}
+.code{background:#f5f0e8;border:1px solid #d4c8b0;border-radius:8px;padding:8px 12px;font-family:monospace;font-size:12px;color:#3a2e22;word-break:break-all;margin:8px 0;line-height:1.6}
+.tip{background:#e8f5e9;border-left:3px solid #4a7c59;border-radius:0 10px 10px 0;padding:10px 14px;font-size:12px;color:#2e5a3a;margin-top:10px}
+.warn{background:#fff8e1;border-left:3px solid #f0a500;border-radius:0 10px 10px 0;padding:10px 14px;font-size:12px;color:#7a5800;margin-top:10px}
+.badge{display:inline-block;background:#8b7355;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;margin-right:4px}
+.badge.green{background:#4a7c59}
+.badge.blue{background:#3a5f8b}
+img-placeholder{display:block;background:#e8e0d5;border-radius:10px;height:60px;line-height:60px;text-align:center;color:#9a8a7a;font-size:12px;margin:8px 0}
+.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}
+.flow-item{background:#f5f0e8;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#6b5a3e;text-align:center}
+.flow-arrow{color:#c4b49a;font-size:18px}
+.summary{background:linear-gradient(135deg,#3a2e22,#6b5a3e);color:#fff;border-radius:16px;padding:20px 24px;margin-bottom:28px}
+.summary h3{color:#c4b49a;border-color:#c4b49a;margin-top:12px}
+.summary li{font-size:13px;color:#f5f0e8;margin-bottom:4px}
+a{color:#8b7355}
+</style>
+</head>
+<body>
+<h1>🎵 賛美グループアプリ</h1>
+<div class="subtitle">全員共有・リアルタイム同期 設定ガイド</div>
+
+<div class="summary">
+  <div style="font-size:15px;font-weight:700;margin-bottom:8px">✦ この設定でできること</div>
+  <ul style="padding-left:18px;margin:0">
+    <li>LINEでURLを送るだけ → 全員がすぐ使える</li>
+    <li>誰かが曲・メンバー・連絡板を更新 → 5秒で全員に反映</li>
+    <li>iPhone・Android どちらでも動く</li>
+    <li>すべて無料（Firebase無料枠・GitHub無料）</li>
+  </ul>
+  <h3>全体の流れ</h3>
+  <div class="flow" style="margin:8px 0">
+    <div class="flow-item">① Firebase作成<br><span style="font-size:10px;opacity:.7">〜3分</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">② GitHubで公開<br><span style="font-size:10px;opacity:.7">〜5分</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">③ LINEで共有<br><span style="font-size:10px;opacity:.7">〜1分</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item" style="background:rgba(255,255,255,.2);color:#fff">✅ 完成！</div>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<h2>STEP 1 ｜ Firebase Realtime Database を作る</h2>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">1</span>Googleアカウントでログイン</div>
+  <div class="step-body">
+    <ul>
+      <li>ブラウザで <a href="https://firebase.google.com" target="_blank"><strong>firebase.google.com</strong></a> を開く</li>
+      <li>右上「コンソールへ移動」をクリック</li>
+      <li>Googleアカウントでログイン（教会のGmailでOK）</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">2</span>プロジェクトを作成</div>
+  <div class="step-body">
+    <ul>
+      <li>「プロジェクトを追加」をクリック</li>
+      <li>プロジェクト名を入力（例：<code>sanbi-renraku</code>）</li>
+      <li>Googleアナリティクスは「無効」でOK → 「プロジェクトを作成」</li>
+    </ul>
+    <div class="tip">💡 プロジェクト名は半角英数字・ハイフンのみ使えます</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">3</span>Realtime Database を有効にする</div>
+  <div class="step-body">
+    <ul>
+      <li>左メニュー「構築」→「<strong>Realtime Database</strong>」をクリック</li>
+      <li>「データベースを作成」ボタンを押す</li>
+      <li>ロケーション：<strong>asia-southeast1（シンガポール）</strong> を選択</li>
+      <li>セキュリティルール：<strong>「テストモードで開始」</strong> を選択 → 「有効にする」</li>
+    </ul>
+    <div class="warn">⚠️ テストモードは30日間有効です。期限が来たらルールを再設定してください（下記参照）</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">4</span>データベースURLをコピー</div>
+  <div class="step-body">
+    <ul>
+      <li>Realtime Databaseの画面上部にURLが表示される</li>
+    </ul>
+    <div class="code">https://sanbi-renraku-default-rtdb.asia-southeast1.firebasedatabase.app</div>
+    <ul>
+      <li>このURLをメモ帳にコピーしておく（あとでアプリに貼り付けます）</li>
+    </ul>
+    <div class="tip">💡 URLは「データ」タブを開くといつでも確認できます</div>
+  </div>
+</div>
+
+<h3>🔒 セキュリティルール（30日後に設定）</h3>
+<div class="step">
+  <div class="step-body">
+    Realtime Database → 「ルール」タブ → 以下を貼り付けて「公開」：
+    <div class="code">{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}</div>
+    <div class="warn">⚠️ このルールは誰でも読み書きできます。教会内グループ用途では十分ですが、URLを外部に漏らさないようにしてください</div>
+  </div>
+</div>
+
+<!-- GITHUB -->
+<h2>STEP 2 ｜ GitHub Pages でアプリを公開する</h2>
+<p style="font-size:13px;color:#6b5a3e;margin-bottom:16px">HTMLファイルをインターネット上に置くことで、URLを開くだけで使えるようになります。</p>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">1</span>GitHubアカウントを作る</div>
+  <div class="step-body">
+    <ul>
+      <li><a href="https://github.com" target="_blank"><strong>github.com</strong></a> を開く → 「Sign up」</li>
+      <li>メールアドレス・パスワード・ユーザー名を設定（無料プランでOK）</li>
+    </ul>
+    <div class="tip">💡 すでにGitHubアカウントをお持ちの方はこの手順は不要です</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">2</span>新しいリポジトリを作る</div>
+  <div class="step-body">
+    <ul>
+      <li>ログイン後、右上「＋」→「New repository」</li>
+      <li>Repository name：<strong>sanbi-app</strong>（何でもOK）</li>
+      <li><strong>「Public」</strong>を選択（Privateだと公開できません）</li>
+      <li>「Add a README file」にチェック → 「Create repository」</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">3</span>HTMLファイルをアップロード</div>
+  <div class="step-body">
+    <ul>
+      <li>作成したリポジトリのページで「Add file」→「Upload files」</li>
+      <li><strong>praise-group.html</strong> をドラッグ＆ドロップ</li>
+      <li>ファイル名を <strong>index.html</strong> に変更する（重要！）</li>
+    </ul>
+    <div class="warn">⚠️ ファイル名が <code>index.html</code> でないとURLで直接開けません。アップロード後にファイル名を変更するか、最初から <code>index.html</code> という名前で保存してください</div>
+    <ul>
+      <li>「Commit changes」ボタンを押す</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">4</span>GitHub Pages を有効にする</div>
+  <div class="step-body">
+    <ul>
+      <li>リポジトリの「Settings」タブ → 左メニュー「Pages」</li>
+      <li>Source：<strong>「Deploy from a branch」</strong></li>
+      <li>Branch：<strong>main</strong> / <strong>/(root)</strong> → 「Save」</li>
+      <li>数分後、以下のようなURLが表示される：</li>
+    </ul>
+    <div class="code">https://あなたのユーザー名.github.io/sanbi-app/</div>
+    <div class="tip">💡 公開まで1〜3分かかります。ページを更新して確認してください</div>
+  </div>
+</div>
+
+<!-- SHARE -->
+<h2>STEP 3 ｜ メンバーに共有する</h2>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">1</span>アプリを開いてFirebaseを設定</div>
+  <div class="step-body">
+    <ul>
+      <li>GitHub PagesのURLをブラウザで開く</li>
+      <li>初回起動時に設定画面が表示される</li>
+      <li>STEP1でコピーした <strong>Firebase URL</strong> を貼り付ける</li>
+      <li>自分の名前を入力 → 「接続して始める」</li>
+    </ul>
+    <div class="tip">💡 2回目以降は設定画面は表示されません（端末に保存されます）</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">2</span>LINEでURLとFirebase URLを共有</div>
+  <div class="step-body">
+    LINEグループに以下のメッセージを送るだけです：
+    <div class="code">【賛美グループ連絡アプリ】
+
+アプリURL：
+https://あなたのユーザー名.github.io/sanbi-app/
+
+初回のみ以下のURLが必要です：
+https://sanbi-renraku-default-rtdb.asia-southeast1.firebasedatabase.app
+
+↑このURLを開いて、設定画面に貼り付けてください。
+名前を入力して「接続して始める」を押せば完了です✦</div>
+    <div class="tip">💡 ホーム画面に追加しておくとアプリのように使えます（Safari → 共有 → ホーム画面に追加）</div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<h2>よくある質問・トラブル</h2>
+
+<div class="step">
+  <div class="step-title">「同期中」にならない</div>
+  <div class="step-body">
+    <ul>
+      <li>Firebase URLが正しいか確認（末尾に <code>/</code> は不要）</li>
+      <li>Firebaseのルールが「テストモード」になっているか確認</li>
+      <li>インターネット接続を確認</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title">Androidで画面が崩れる</div>
+  <div class="step-body">
+    <ul>
+      <li>Chrome最新版で開いてください（Safariと同等の表示になります）</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title">設定をやり直したい</div>
+  <div class="step-body">
+    <ul>
+      <li>Chromeの場合：設定 → サイトの設定 → データを削除</li>
+      <li>Safariの場合：設定 → Safari → 詳細 → Webサイトデータ → 該当サイトを削除</li>
+      <li>その後アプリを再読み込みすると設定画面が表示されます</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title">HTMLファイルを更新したい</div>
+  <div class="step-body">
+    <ul>
+      <li>GitHubのリポジトリで <code>index.html</code> をクリック → 鉛筆アイコン（編集）</li>
+      <li>または「Add file」→「Upload files」で上書きアップロード</li>
+      <li>Commit後、数分で全員の画面に反映されます</li>
+    </ul>
+  </div>
+</div>
+
+<div style="background:#f5f0e8;border-radius:14px;padding:18px 20px;margin-top:32px;text-align:center">
+  <div style="font-size:14px;font-weight:700;color:#6b5a3e;margin-bottom:6px">✦ 費用について</div>
+  <div style="font-size:12px;color:#8b7355;line-height:1.8">
+    Firebase 無料枠：同時接続100人・保存1GB・月10万回読み込み<br>
+    GitHub Pages：完全無料・容量1GB<br>
+    <strong>6人程度の利用であれば、すべて永久無料で使えます</strong>
+  </div>
+</div>
+
+</body>
+</html>
